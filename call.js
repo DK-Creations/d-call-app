@@ -174,27 +174,22 @@ function toggleAudio(b) {
 }
 
 function switchCam(c) {
-
-    if(c != -1) {
-
-        cam = c;
-
-    }
-
     
-
     localStream.getTracks().forEach((track)=> {
 
         if (track.readyState == 'live') {
 
             track.stop();
-
-                
-
+            
         }
-
     });
 
-    startCall(ID2)
+    if(c != -1) {
 
+        cam = c;
+        
+        startCall(ID2)
+
+    }
+    
 }
