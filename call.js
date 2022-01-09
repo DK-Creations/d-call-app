@@ -125,9 +125,9 @@ function startCall(otherUserId) {
             localStream = stream
             localVideo.srcObject = localStream
 
-        const remoteCall = peer.call(otherUserId, localStream)
+        const localCall = peer.call(otherUserId, localStream)
 
-        listenStream(remoteCall)
+        listenStream(localCall)
 
     })
 }
