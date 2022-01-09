@@ -83,6 +83,8 @@ let localStream
 
 function listen() {
     peer.on('call', (remoteCall) => {
+        
+        ID2 = remoteCall.id
 
         navigator.getUserMedia({
             audio: true, 
