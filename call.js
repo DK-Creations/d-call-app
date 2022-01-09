@@ -10,9 +10,11 @@ localVideo.onplaying = () => { localVideo.style.opacity = 1 }
 
 remoteVideo.onplaying = () => { remoteVideo.style.opacity = 1 }
 
-var B = "true";
-
 var cam = 0;
+
+var ID1;
+
+var ID2;
 
 var VideoTracks=[];
 
@@ -49,8 +51,11 @@ navigator.mediaDevices.enumerateDevices().then((device)=>{
 });
 
 let peer
+let call
 
 function init(userId) {
+
+    ID1 = userId
 
     peer = new Peer(userId, {
 
@@ -69,15 +74,6 @@ function init(userId) {
         alert('Initialised')
 
     })
-
-    
-
-    peer.on('close',()=>{
-
-        alert('Destroyed')
-
-    })
-
     
 
     listen()
@@ -87,51 +83,27 @@ function init(userId) {
 let localStream
 
 function listen() {
+    peer.on('call', (remotecall) => {
 
-    peer.on('call', (call) => {
+        call = remotecall;
 
         navigator.getUserMedia({
-
             audio: true, 
-
             video: {
-
                 deviceId: VideoTracks[cam].deviceId
-
             }
-
         }, (stream) => {
-
-            
-
-            localVideo.srcObject = null
-
-        localStream = null
-
-            localVideo.srcObject = stream
-
+            localStream = null
             localStream = stream
+            localVideo.srcObject = localStream
 
-            call.answer(stream)
+            call.answer(localStream)
 
-            call.on('stream', (remoteStream) => {
-
-                remoteVideo.srcObject = null
-
-                remoteVideo.srcObject = remoteStream
-
-                remoteVideo.className = "primary-video"
-
-                localVideo.className = "secondary-video"
-
-            })
+            listenStream()
 
         })
-
         
-
     })
-
 }
 
 function startWebCall(ID) {
@@ -142,48 +114,35 @@ function startWebCall(ID) {
 
 function startCall(otherUserId) {
 
+    ID2 = otherUserId
+
     alert('Calling:'+otherUserId)
 
     navigator.getUserMedia({
-
         audio: true,
-
         video: {
-
                 deviceId: VideoTracks[cam].deviceId
-
             }
-
         }, (stream) => {
-
-            
-
-            localVideo.srcObject = null
-
-        localStream = null
-
-            
-
-            localVideo.srcObject = stream
-
+            localStream = null
             localStream = stream
+            localVideo.srcObject = localStream
 
-        const call = peer.call(otherUserId, stream)
+        call = peer.call(otherUserId, localStream)
 
-        call.on('stream', (remoteStream) => {
-
-            remoteVideo.srcObject = null
-
-			            remoteVideo.srcObject = remoteStream
-
-            remoteVideo.className = "primary-video"
-
-            localVideo.className = "secondary-video"
-
-        })
+        listenStream()
 
     })
+}
 
+function listenStream() {
+    call.on('stream', (remoteStream) => {
+            
+        remoteVideo.srcObject = remoteStream
+    
+        remoteVideo.className = "primary-video"
+        localVideo.className = "secondary-video"
+    })
 }
 
 function toggleVideo(b) {
@@ -236,8 +195,6 @@ function switchCam(c) {
 
     });
 
-    
-
-    peer.destroy();
+    startCall(ID2)
 
 }
