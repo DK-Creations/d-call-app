@@ -51,7 +51,6 @@ navigator.mediaDevices.enumerateDevices().then((device)=>{
 });
 
 let peer
-let call
 
 function init(userId) {
 
@@ -83,9 +82,7 @@ function init(userId) {
 let localStream
 
 function listen() {
-    peer.on('call', (remotecall) => {
-
-        call = remotecall;
+    peer.on('call', (remoteCall) => {
 
         navigator.getUserMedia({
             audio: true, 
@@ -97,9 +94,9 @@ function listen() {
             localStream = stream
             localVideo.srcObject = localStream
 
-            call.answer(localStream)
+            remoteCall.answer(localStream)
 
-            listenStream()
+            listenStream(remoteCall)
 
         })
         
@@ -128,14 +125,14 @@ function startCall(otherUserId) {
             localStream = stream
             localVideo.srcObject = localStream
 
-        call = peer.call(otherUserId, localStream)
+        const remoteCall = peer.call(otherUserId, localStream)
 
-        listenStream()
+        listenStream(remoteCall)
 
     })
 }
 
-function listenStream() {
+function listenStream(call) {
     call.on('stream', (remoteStream) => {
             
         remoteVideo.srcObject = remoteStream
